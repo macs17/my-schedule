@@ -2,8 +2,14 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <meta name="theme-color" content="#000000">
+  <meta name="theme-color" content="#0a84ff">
   <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Расписание">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>My Schedule</title>
   <style>
@@ -98,7 +104,7 @@
     .day-header.today .day-num {
       animation: pulseGlow 2.5s ease-in-out infinite;
     }
-    .app { max-width: 1100px; margin: 0 auto; padding: 6px 14px 56px; }
+    .app { max-width: 1100px; margin: 0 auto; padding: 6px 14px calc(56px + env(safe-area-inset-bottom, 0px)); }
 
     .top-row {
       display: flex; align-items: center; gap: 6px; margin-bottom: 16px;
@@ -125,8 +131,9 @@
     }
     .menu-btn:active, .theme-btn:active { opacity: 0.55; transform: scale(0.9); }
     .top-title {
-      flex: 1; font-size: 1.15rem; font-weight: 700; letter-spacing: -0.03em;
+      flex: 1; min-width: 0; font-size: 1.1rem; font-weight: 700; letter-spacing: -0.03em;
       color: var(--text); text-align: center;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
     .top-title span {
       color: var(--text);
@@ -413,7 +420,7 @@
       background: rgba(120,120,128,0.12);
       border: 1px solid var(--border);
       border-radius: 12px;
-      color: var(--text); font-size: 1rem; font-family: inherit; outline: none;
+      color: var(--text); font-size: 16px; font-family: inherit; outline: none;
       -webkit-appearance: none; appearance: none;
     }
     .form-group input[type="number"] {
@@ -567,7 +574,7 @@
       border-radius: 28px 28px 0 0;
       border: 1px solid var(--border);
       border-bottom: none;
-      width: 100%; max-width: 500px; max-height: 92vh; overflow-y: auto;
+      width: 100%; max-width: 500px; max-height: min(92vh, 100dvh - 20px); overflow-y: auto; -webkit-overflow-scrolling: touch;
       padding: 10px 18px 36px;
       box-shadow: 0 -12px 48px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.12);
       animation: sheetUp 0.38s cubic-bezier(0.32, 0.72, 0, 1);
@@ -775,6 +782,129 @@
       height: 3px; border-radius: 2px; margin-bottom: 12px;
       background: var(--primary);
     }
+  
+    .attend-block { margin: 14px 0 8px; }
+    .attend-label {
+      font-size: 0.72rem; font-weight: 600; color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;
+    }
+    .attend-toggle {
+      display: flex; gap: 6px; margin-bottom: 10px;
+    }
+    .attend-btn {
+      flex: 1; padding: 10px 6px; border-radius: 12px;
+      border: 1px solid var(--border); background: rgba(255,255,255,0.06);
+      color: var(--text-muted); font-size: 0.82rem; font-weight: 600;
+      font-family: inherit; cursor: pointer;
+      transition: all 0.15s;
+    }
+    .attend-btn.active-yes {
+      background: rgba(48,209,88,0.2); border-color: rgba(48,209,88,0.4); color: #30d158;
+    }
+    .attend-btn.active-no {
+      background: rgba(255,69,58,0.2); border-color: rgba(255,69,58,0.4); color: #ff453a;
+    }
+    .attend-btn.active-none {
+      background: var(--primary-soft); border-color: rgba(10,132,255,0.3); color: var(--primary);
+    }
+    #viewMissReasonWrap { display: none; margin-top: 8px; }
+    #viewMissReasonWrap.show { display: block; }
+    #viewMissReason {
+      width: 100%; min-height: 72px; padding: 12px;
+      background: rgba(120,120,128,0.12); border: 1px solid var(--border);
+      border-radius: 12px; color: var(--text); font-size: 0.95rem;
+      font-family: inherit; resize: vertical; outline: none;
+    }
+    .event.attended {
+      box-shadow: 0 0 0 2.5px #30d158, 0 4px 14px rgba(48,209,88,0.45), inset 0 1px 0 rgba(255,255,255,0.25);
+      border-left: 4px solid #30d158 !important;
+    }
+    .event.missed {
+      box-shadow: 0 0 0 2.5px #ff453a, 0 4px 14px rgba(255,69,58,0.4), inset 0 1px 0 rgba(255,255,255,0.15);
+      border-left: 4px solid #ff453a !important;
+      opacity: 0.9;
+    }
+    .event-badge {
+      position: absolute; top: 2px; right: 3px;
+      width: 16px; height: 16px; border-radius: 50%;
+      font-size: 0.65rem; line-height: 16px; text-align: center;
+      font-weight: 700; z-index: 3;
+    }
+    .event.attended .event-badge {
+      background: #30d158; color: #000;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+    }
+    .event.missed .event-badge {
+      background: #ff453a; color: #fff;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+    }
+
+  
+    .account-chips { display: flex; gap: 6px; flex-wrap: wrap; padding: 0 0 10px; margin-bottom: 4px; }
+    .account-chip {
+      padding: 8px 12px; border-radius: 14px; font-size: 0.78rem; font-weight: 600;
+      background: var(--surface); border: 1px solid var(--border); color: var(--text-muted);
+      cursor: pointer; font-family: inherit;
+    }
+    .account-chip.active { color: #fff; border-color: transparent; }
+    .account-chip[data-account="personal"].active { background: #0a84ff; }
+    .account-chip[data-account="family"].active { background: #bf5af2; }
+    .account-chip[data-account="savings"].active { background: #30d158; color: #000; }
+    .account-chip[data-account="all"].active { background: var(--primary); }
+    .fin-accounts-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+      gap: 8px; margin-bottom: 12px;
+    }
+    .fin-acc-card {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+      padding: 12px 8px; text-align: center;
+    }
+    .fin-acc-card .fl { font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; }
+    .fin-acc-card .fv { font-size: 0.95rem; font-weight: 700; }
+    .fin-acc-card.personal .fv { color: #0a84ff; }
+    .fin-acc-card.family .fv { color: #bf5af2; }
+    .fin-acc-card.savings .fv { color: #30d158; }
+
+  
+    .fin-tools {
+      display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap;
+    }
+    .fin-tools button {
+      flex: 1; min-width: 120px; padding: 11px 12px; border-radius: 12px;
+      border: 1px solid var(--border); background: var(--surface);
+      color: var(--primary); font-size: 0.85rem; font-weight: 600;
+      font-family: inherit; cursor: pointer;
+    }
+    .fin-tools button:active { opacity: 0.7; }
+
+  
+    .remind-block {
+      margin-top: 10px; padding: 12px;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid var(--border);
+    }
+    .remind-block .rb-title {
+      font-size: 0.8rem; font-weight: 600; margin-bottom: 8px; color: var(--text);
+    }
+    .remind-row {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 8px; margin-bottom: 8px; font-size: 0.88rem; color: var(--text-muted);
+    }
+    .remind-row select {
+      flex: 1; max-width: 140px; padding: 8px 10px; border-radius: 10px;
+      border: 1px solid var(--border); background: rgba(120,120,128,0.12);
+      color: var(--text); font-size: 14px; font-family: inherit;
+    }
+    .remind-status {
+      font-size: 0.75rem; color: var(--text-muted); margin-top: 4px;
+    }
+    .remind-status.on { color: #30d158; }
+    .remind-status.off { color: #ff453a; }
+    .pwa-hint {
+      font-size: 0.75rem; color: var(--text-muted); line-height: 1.35;
+      margin-top: 8px; padding: 0 4px;
+    }
   </style>
 </head>
 <body>
@@ -806,6 +936,9 @@
           <span class="di-icon">💰</span> <span data-i18n="nav_finance">Финансы</span>
         </button>
       </nav>
+      <div class="pwa-hint" id="pwaHint" style="margin:10px 4px 6px;font-size:0.75rem;color:var(--text-muted);line-height:1.35">
+        Чтобы установить приложение: в меню браузера выбери «На экран „Домой“» / «Установить приложение».
+      </div>
       <div class="drawer-data">
         <button type="button" class="drawer-data-btn" id="exportBtn">
           <span>💾</span> <span data-i18n="export_data">Сохранить в файл</span>
@@ -977,6 +1110,11 @@
         <div class="fin-card"><div class="fl">Расходы</div><div class="fv expense" id="sumExpense">0 ₽</div></div>
         <div class="fin-card"><div class="fl">Баланс</div><div class="fv balance" id="sumBalance">0 ₽</div></div>
       </div>
+      <div class="fin-accounts-grid" id="accountBalances"></div>
+      <div class="fin-tools">
+        <button type="button" id="finTransferBtn">↔️ Перевод</button>
+        <button type="button" id="finManageAccBtn">⚙️ Счета</button>
+      </div>
       <div class="main goals-main">
         <div class="card">
           <div class="card-header" data-i18n="new_record">Новая запись</div>
@@ -986,6 +1124,14 @@
               <button type="button" class="type-btn income" data-type="income">Доход</button>
             </div>
             <input type="hidden" id="txType" value="expense">
+            <div class="form-group">
+              <label>Счёт</label>
+              <select id="txAccount">
+                <option value="personal">👤 Личные</option>
+                <option value="family">👨‍👩‍👧 Семья</option>
+                <option value="savings">🏦 Накопления</option>
+              </select>
+            </div>
             <div class="form-group">
               <label>Сумма</label>
               <input type="number" id="txAmount" placeholder="Например 500" min="0" step="0.01" required>
@@ -1007,6 +1153,12 @@
         </div>
         <div class="card">
           <div class="card-header" style="padding-bottom:8px;" data-i18n="history">История</div>
+          <div class="account-chips" id="accountFilters" style="padding: 0 12px;">
+            <button type="button" class="account-chip active" data-account="all">Все счета</button>
+            <button type="button" class="account-chip" data-account="personal">👤 Личные</button>
+            <button type="button" class="account-chip" data-account="family">👨‍👩‍👧 Семья</button>
+            <button type="button" class="account-chip" data-account="savings">🏦 Накопления</button>
+          </div>
           <div class="filters" id="financeFilters" style="padding: 0 12px 8px;">
             <button type="button" class="filter-chip active" data-fin-filter="all">Все</button>
             <button type="button" class="filter-chip" data-fin-filter="expense">Расходы</button>
@@ -1041,6 +1193,19 @@
       <div class="modal-row" id="viewCatRow">
         <div class="label" data-i18n="category">Категория</div>
         <div class="value" id="viewCategory">—</div>
+      </div>
+      <div class="attend-block">
+        <div class="attend-label" data-i18n="attendance">Посещение</div>
+        <div class="attend-toggle">
+          <button type="button" class="attend-btn" id="attendNone" data-status="none">—</button>
+          <button type="button" class="attend-btn" id="attendYes" data-status="attended">✓</button>
+          <button type="button" class="attend-btn" id="attendNo" data-status="missed">✕</button>
+        </div>
+        <div id="viewMissReasonWrap">
+          <div class="attend-label" data-i18n="miss_reason">Почему не получилось</div>
+          <textarea id="viewMissReason" data-i18n-placeholder="miss_reason_ph" placeholder="Напиши причину..."></textarea>
+          <button type="button" class="btn-primary" id="attendSaveReason" style="margin-top:8px;" data-i18n="save">Сохранить</button>
+        </div>
       </div>
       <button type="button" class="btn-primary" id="viewEditBtn" style="margin-top:8px;" data-i18n="edit">Редактировать</button>
       <button type="button" class="btn-danger" id="viewDeleteBtn" data-i18n="delete">Удалить</button>
@@ -1168,6 +1333,36 @@
   </div>
 
   
+  
+  <div class="modal-overlay" id="transferModal">
+    <div class="modal">
+      <div class="modal-handle"></div>
+      <h2>Перевод между счетами</h2>
+      <div class="form" style="padding:0">
+        <div class="form-group"><label>Откуда</label><select id="trFrom"></select></div>
+        <div class="form-group"><label>Куда</label><select id="trTo"></select></div>
+        <div class="form-group"><label>Сумма</label><input type="number" id="trAmount" min="0" step="0.01"></div>
+        <div class="form-group"><label>Описание</label><input type="text" id="trNote"></div>
+        <div class="form-group"><label>Дата</label><input type="date" id="trDate"></div>
+        <button type="button" class="btn-primary" id="trSave">Сохранить</button>
+        <button type="button" class="modal-close" id="trClose">Отмена</button>
+      </div>
+    </div>
+  </div>
+  <div class="modal-overlay" id="accountsModal">
+    <div class="modal">
+      <div class="modal-handle"></div>
+      <h2>Управление счетами</h2>
+      <div id="accountsManageList" style="margin-bottom:14px;"></div>
+      <div class="form" style="padding:0">
+        <div class="form-group"><label>Новый счёт</label><input type="text" id="newAccName" placeholder="Название"></div>
+        <div class="form-group"><label>Цвет</label><input type="color" id="newAccColor" value="#0a84ff"></div>
+        <button type="button" class="btn-primary" id="newAccSave">Добавить</button>
+        <button type="button" class="modal-close" id="accountsClose">Закрыть</button>
+      </div>
+    </div>
+  </div>
+
   <div class="modal-overlay" id="financeModal">
     <div class="modal">
       <div class="modal-handle"></div>
@@ -1178,6 +1373,13 @@
           <button type="button" class="type-btn income" id="editTxTypeIncome" data-type="income">Доход</button>
         </div>
         <input type="hidden" id="editTxType" value="expense">
+        <div class="form-group"><label>Счёт</label>
+          <select id="editTxAccount">
+            <option value="personal">👤 Личные</option>
+            <option value="family">👨‍👩‍👧 Семья</option>
+            <option value="savings">🏦 Накопления</option>
+          </select>
+        </div>
         <div class="form-group"><label>Сумма</label><input type="number" id="editTxAmount" min="0" step="0.01"></div>
         <div class="form-group"><label>Категория</label><select id="editTxCategory"></select></div>
         <div class="form-group"><label>Описание</label><input type="text" id="editTxNote"></div>
@@ -1240,7 +1442,11 @@
           export_data: 'Сохранить в файл', import_data: 'Загрузить из файла',
           export_ok: 'Данные сохранены в файл',
           import_ok: 'Данные загружены',
-          import_err: 'Не удалось прочитать файл'
+          import_err: 'Не удалось прочитать файл',
+          attendance: 'Посещение', attend_none: 'Не отмечено', attend_yes: 'Посетил', attend_no: 'Не получилось',
+          miss_reason: 'Почему не получилось', miss_reason_ph: 'Напиши причину...',
+          account: 'Счёт', acc_personal: 'Личные', acc_family: 'Семья', acc_savings: 'Накопления',
+          all_accounts: 'Все счета'
         },
         en: {
           title_schedule: 'Schedule', title_goals: 'Goals', title_ideas: 'Ideas', title_finance: 'Finance',
@@ -1286,7 +1492,11 @@
           export_data: 'Save to file', import_data: 'Load from file',
           export_ok: 'Data saved to file',
           import_ok: 'Data loaded',
-          import_err: 'Could not read file'
+          import_err: 'Could not read file',
+          attendance: 'Attendance', attend_none: 'Not marked', attend_yes: 'Attended', attend_no: 'Missed',
+          miss_reason: 'Why you missed it', miss_reason_ph: 'Write the reason...',
+          account: 'Account', acc_personal: 'Personal', acc_family: 'Family', acc_savings: 'Savings',
+          all_accounts: 'All accounts'
         }
       };
       let lang = 'ru';
@@ -1518,9 +1728,21 @@
       let goals = load('schedule_goals', []);
       let ideas = load('schedule_ideas', []);
       let transactions = load('schedule_finance', []);
+      const DEFAULT_ACCOUNTS = [
+        { id: 'personal', name: 'Личные', color: '#0a84ff', icon: '👤' },
+        { id: 'family', name: 'Семья', color: '#bf5af2', icon: '👨‍👩‍👧' },
+        { id: 'savings', name: 'Накопления', color: '#30d158', icon: '🏦' }
+      ];
+      let accounts = load('schedule_accounts', null);
+      if (!Array.isArray(accounts) || !accounts.length) accounts = DEFAULT_ACCOUNTS.slice();
+      accounts = accounts.filter(function(a){ return a && a.id && a.name; });
+      if (!accounts.length) accounts = DEFAULT_ACCOUNTS.slice();
+
       let selectedEventId = null;
+      let selectedEventDate = null;
       let selectedTxId = null;
       let finFilter = 'all';
+      let finAccount = 'all';
       let formTxType = 'expense';
 
       let EXPENSE_CATS = [
@@ -1552,6 +1774,54 @@
         var c = getCats(type).find(function(x){return x.id===id;});
         return c ? c.name : id;
       }
+
+      
+      function getAccount(id) {
+        return accounts.find(function(a){ return a.id === id; }) || accounts[0] || { id: 'personal', name: 'Личные', color: '#0a84ff', icon: '👤' };
+      }
+      function accountName(id) {
+        var a = getAccount(id);
+        return (a.icon ? a.icon + ' ' : '') + (a.name || id);
+      }
+      function fillAccountSelects() {
+        var opts = accounts.map(function(a) {
+          return '<option value="'+a.id+'">'+(a.icon?a.icon+' ':'')+esc(a.name)+'</option>';
+        }).join('');
+        ['txAccount','editTxAccount','trFrom','trTo'].forEach(function(id) {
+          var el = document.getElementById(id);
+          if (!el) return;
+          var cur = el.value;
+          el.innerHTML = opts;
+          if (cur && accounts.some(function(a){ return a.id === cur; })) el.value = cur;
+        });
+      }
+      function saveAccounts() {
+        save('schedule_accounts', accounts);
+        fillAccountSelects();
+        renderFinance();
+      }
+      function renderAccountsManage() {
+        var list = document.getElementById('accountsManageList');
+        if (!list) return;
+        list.innerHTML = accounts.map(function(a) {
+          return '<div class="tx-item" style="margin-bottom:6px;cursor:default">' +
+            '<div class="tx-icon" style="background:'+a.color+'22"><span style="font-size:1.1rem">'+(a.icon||'💰')+'</span></div>' +
+            '<div class="tx-body"><div class="tx-title">'+esc(a.name)+'</div></div>' +
+            (accounts.length > 1 ? '<button type="button" class="edit-btn" data-del-acc="'+a.id+'" style="color:#ff453a;font-size:1.2rem">×</button>' : '') +
+            '</div>';
+        }).join('');
+        list.querySelectorAll('[data-del-acc]').forEach(function(btn) {
+          btn.onclick = function() {
+            var id = btn.getAttribute('data-del-acc');
+            if (accounts.length <= 1) return;
+            if (!confirm('Удалить счёт? Записи останутся.')) return;
+            accounts = accounts.filter(function(a){ return a.id !== id; });
+            saveAccounts();
+            renderAccountsManage();
+          };
+        });
+      }
+
       function formatMoney(n) {
         n = Number(n) || 0;
         return n.toLocaleString(lang==='en'?'en-US':'ru-RU', {maximumFractionDigits: 0}) + (lang==='en' ? ' ₽' : ' ₽');
@@ -1602,7 +1872,8 @@
                 baseId: ev.id,
                 title: ev.title, date: ds, start: ev.start, end: ev.end,
                 address: ev.address, notes: ev.notes, color: ev.color,
-                category: ev.category, repeat: true
+                category: ev.category, repeat: true,
+                attendanceLog: ev.attendanceLog, attendance: ev.attendance, missReason: ev.missReason
               });
             }
             cur.setDate(cur.getDate() + 7);
@@ -1703,7 +1974,11 @@
             var top = (pt(ev.start)-START_HOUR)*HOUR_HEIGHT;
             var ht = Math.max((pt(ev.end)-pt(ev.start))*HOUR_HEIGHT, 18);
             var rid = ev.baseId || ev.id;
-            html += '<div class="event" style="top:'+top+'px;height:'+ht+'px;background:'+(ev.color||'#6366f1')+'" data-id="'+rid+'" data-date="'+ev.date+'">' +
+            var att = getAttendance(ev, ev.date);
+            var attClass = att.status === 'attended' ? ' attended' : (att.status === 'missed' ? ' missed' : '');
+            var badge = att.status === 'attended' ? '<span class="event-badge">✓</span>' : (att.status === 'missed' ? '<span class="event-badge">✕</span>' : '');
+            html += '<div class="event'+attClass+'" style="top:'+top+'px;height:'+ht+'px;background:'+(ev.color||'#6366f1')+'" data-id="'+rid+'" data-date="'+ev.date+'">' +
+              badge +
               '<div class="event-title">'+esc(ev.title)+'</div>' +
               '<div class="event-time">'+ev.start+'–'+ev.end+(ev.repeat?' 🔄':'')+'</div></div>';
           });
@@ -1718,7 +1993,7 @@
         grid.innerHTML = html;
         grid.querySelectorAll('.event').forEach(function(el) {
           el.addEventListener('click', function() {
-            openEventModal(el.getAttribute('data-id'));
+            openEventModal(el.getAttribute('data-id'), el.getAttribute('data-date'));
           });
         });
       }
@@ -1775,12 +2050,60 @@
       var selectedGoalId = null;
       var selectedIdeaId = null;
 
-      function openEventModal(id) {
+
+      function getAttendance(ev, date) {
+        var d = date || ev.date;
+        if (ev.attendanceLog && ev.attendanceLog[d]) {
+          return { status: ev.attendanceLog[d].status || 'none', reason: ev.attendanceLog[d].reason || '' };
+        }
+        if (!ev.repeat && ev.attendance) {
+          return { status: ev.attendance, reason: ev.missReason || '' };
+        }
+        return { status: 'none', reason: '' };
+      }
+      function setAttendance(ev, date, status, reason) {
+        if (!ev.attendanceLog) ev.attendanceLog = {};
+        var d = date || ev.date;
+        if (status === 'none') {
+          delete ev.attendanceLog[d];
+        } else {
+          ev.attendanceLog[d] = { status: status, reason: (reason || '') };
+        }
+        // keep simple fields for non-repeat
+        if (!ev.repeat) {
+          ev.attendance = status;
+          ev.missReason = status === 'missed' ? (reason || '') : '';
+        }
+      }
+      function updateAttendUI(status, reason) {
+        var none = document.getElementById('attendNone');
+        var yes = document.getElementById('attendYes');
+        var no = document.getElementById('attendNo');
+        if (!none) return;
+        none.className = 'attend-btn' + (status === 'none' ? ' active-none' : '');
+        yes.className = 'attend-btn' + (status === 'attended' ? ' active-yes' : '');
+        no.className = 'attend-btn' + (status === 'missed' ? ' active-no' : '');
+        none.textContent = t('attend_none');
+        yes.textContent = '✓ ' + t('attend_yes');
+        no.textContent = '✕ ' + t('attend_no');
+        var wrap = document.getElementById('viewMissReasonWrap');
+        var ta = document.getElementById('viewMissReason');
+        if (status === 'missed') {
+          wrap.classList.add('show');
+          if (ta) { ta.value = reason || ''; ta.placeholder = t('miss_reason_ph'); }
+        } else {
+          wrap.classList.remove('show');
+          if (ta) ta.value = '';
+        }
+      }
+
+      function openEventModal(id, date) {
         var ev = events.find(function(e){return e.id===id;});
         if (!ev) return;
         selectedEventId = id;
+        selectedEventDate = date || ev.date;
         document.getElementById('viewTitle').textContent = ev.title || '—';
-        document.getElementById('viewTime').textContent = fmtDateNice(ev.date) + ' · ' + (ev.start||'') + ' – ' + (ev.end||'');
+        document.getElementById('viewTime').textContent = fmtDateNice(selectedEventDate) + ' · ' + (ev.start||'') + ' – ' + (ev.end||'');
         document.getElementById('viewColorBar').style.background = ev.color || '#6366f1';
         var ar = document.getElementById('viewAddressRow');
         if (ev.address) { ar.style.display = 'block'; document.getElementById('viewAddress').textContent = ev.address; }
@@ -1791,6 +2114,8 @@
         document.getElementById('viewRepeatRow').style.display = ev.repeat ? 'block' : 'none';
         var catLabels = { study:t('cat_study'), work:t('cat_work'), sport:t('cat_sport'), personal:t('cat_personal'), other:t('cat_other') };
         document.getElementById('viewCategory').textContent = catLabels[ev.category] || catLabels.other;
+        var att = getAttendance(ev, selectedEventDate);
+        updateAttendUI(att.status, att.reason);
         document.getElementById('eventViewModal').classList.add('open');
       }
       function closeEventView() {
@@ -1978,35 +2303,63 @@
 
       function renderFinance() {
         var income = 0, expense = 0;
+        var byAcc = {};
+        accounts.forEach(function(a){ byAcc[a.id] = 0; });
         transactions.forEach(function(t) {
           var a = Number(t.amount) || 0;
-          if (t.type === 'income') income += a; else expense += a;
+          var acc = t.account || (accounts[0] && accounts[0].id) || 'personal';
+          if (byAcc[acc] === undefined) byAcc[acc] = 0;
+          if (t.type === 'income') { income += a; byAcc[acc] += a; }
+          else { expense += a; byAcc[acc] -= a; }
         });
         document.getElementById('sumIncome').textContent = formatMoney(income);
         document.getElementById('sumExpense').textContent = formatMoney(expense);
         document.getElementById('sumBalance').textContent = formatMoney(income - expense);
-
+        var grid = document.getElementById('accountBalances');
+        if (grid) {
+          grid.style.gridTemplateColumns = accounts.length <= 3 ? 'repeat('+accounts.length+', 1fr)' : 'repeat(3, 1fr)';
+          grid.innerHTML = accounts.map(function(a) {
+            var bal = byAcc[a.id] || 0;
+            return '<div class="fin-acc-card" style="border-color:'+a.color+'55"><div class="fl">'+(a.icon?a.icon+' ':'')+esc(a.name)+'</div><div class="fv" style="color:'+a.color+'">'+formatMoney(bal)+'</div></div>';
+          }).join('');
+        }
+        var af = document.getElementById('accountFilters');
+        if (af) {
+          var chips = '<button type="button" class="account-chip'+(finAccount==='all'?' active':'')+'" data-account="all">Все счета</button>';
+          accounts.forEach(function(a) {
+            var active = finAccount === a.id;
+            chips += '<button type="button" class="account-chip'+(active?' active':'')+'" data-account="'+a.id+'"'+(active?' style="background:'+a.color+';color:#fff;border-color:transparent"':'')+'>'+(a.icon?a.icon+' ':'')+esc(a.name)+'</button>';
+          });
+          af.innerHTML = chips;
+          af.querySelectorAll('[data-account]').forEach(function(chip) {
+            chip.addEventListener('click', function() {
+              finAccount = chip.getAttribute('data-account');
+              renderFinance();
+            });
+          });
+        }
         var list = document.getElementById('txList');
         var filtered = transactions.slice();
         if (finFilter !== 'all') filtered = filtered.filter(function(t){ return t.type === finFilter; });
+        if (finAccount !== 'all') filtered = filtered.filter(function(t){ return (t.account || 'personal') === finAccount; });
         filtered.sort(function(a,b){ return (b.date||'').localeCompare(a.date||'') || (b.created||0)-(a.created||0); });
-
         if (!filtered.length) {
-          list.innerHTML = '<div class="empty-state">'+t('no_records')+'</div>';
+          list.innerHTML = '<div class="empty-state">Пока нет записей</div>';
           return;
         }
         list.innerHTML = filtered.map(function(t) {
           var isInc = t.type === 'income';
-          return '<div class="tx-item" data-tx="'+t.id+'">' +
-            '<div class="tx-icon '+(isInc?'income':'expense')+'">'+(isInc?'⬇️':'⬆️')+'</div>' +
-            '<div class="tx-body"><div class="tx-title">'+esc(t.note || catName(t.type, t.category))+'</div>' +
-            '<div class="tx-meta">'+catName(t.type, t.category)+' · '+fmtDateNice(t.date)+'</div></div>' +
-            '<div class="tx-amount '+(isInc?'income':'expense')+'">'+(isInc?'+':'-')+formatMoney(t.amount)+'</div></div>';
+          var isTr = !!t.transfer;
+          var acc = t.account || 'personal';
+          var title = t.note || (isTr ? (t.transfer === 'out' ? ('→ ' + accountName(t.transferTo)) : ('← ' + accountName(t.transferFrom))) : catName(t.type, t.category));
+          var meta = accountName(acc) + (isTr ? ' · Перевод' : ' · ' + catName(t.type, t.category)) + ' · ' + fmtDateNice(t.date);
+          return '<div class="tx-item" data-tx="'+t.id+'"><div class="tx-icon '+(isInc?'income':'expense')+'">'+(isTr?'↔️':(isInc?'⬇️':'⬆️'))+'</div><div class="tx-body"><div class="tx-title">'+esc(title)+'</div><div class="tx-meta">'+meta+'</div></div><div class="tx-amount '+(isInc?'income':'expense')+'">'+(isInc?'+':'-')+formatMoney(t.amount)+'</div></div>';
         }).join('');
         list.querySelectorAll('.tx-item').forEach(function(el) {
           el.onclick = function() { openFinanceModal(el.getAttribute('data-tx')); };
         });
       }
+
 
       function openFinanceModal(id) {
         var t = transactions.find(function(x){return x.id===id;});
@@ -2017,7 +2370,10 @@
         document.getElementById('editTxTypeIncome').classList.toggle('active', t.type==='income');
         document.getElementById('editTxTypeExpense').classList.toggle('expense', true);
         document.getElementById('editTxTypeIncome').classList.toggle('income', true);
+        fillAccountSelects();
         fillCatSelect(document.getElementById('editTxCategory'), t.type, t.category);
+        var accSel = document.getElementById('editTxAccount');
+        if (accSel) accSel.value = t.account || (accounts[0] && accounts[0].id) || 'personal';
         document.getElementById('editTxAmount').value = t.amount;
         document.getElementById('editTxNote').value = t.note || '';
         document.getElementById('editTxDate').value = t.date || '';
@@ -2027,6 +2383,32 @@
         document.getElementById('financeModal').classList.remove('open');
         selectedTxId = null;
       }
+
+      
+      function initPWA() {
+        if ('serviceWorker' in navigator) {
+          navigator.serviceWorker.register('./sw.js').catch(function(){});
+        }
+        // optional install prompt
+        window.addEventListener('beforeinstallprompt', function(e) {
+          e.preventDefault();
+          window._deferredInstall = e;
+          var hint = document.getElementById('pwaHint');
+          if (hint) {
+            hint.innerHTML = 'Можно установить приложение. <button type="button" id="pwaInstallBtn" class="drawer-data-btn" style="margin-top:6px"><span>📲</span> Установить</button>';
+            setTimeout(function() {
+              var b = document.getElementById('pwaInstallBtn');
+              if (b) b.onclick = function() {
+                if (window._deferredInstall) {
+                  window._deferredInstall.prompt();
+                  window._deferredInstall.userChoice.then(function(){ window._deferredInstall = null; });
+                }
+              };
+            }, 50);
+          }
+        });
+      }
+
 
       function init() {
         document.querySelectorAll('.drawer-item').forEach(function(t){t.addEventListener('click',function(){switchTab(t.dataset.tab);});});
@@ -2100,8 +2482,8 @@
         };
 
         // Event view modal
-        document.getElementById('viewCloseBtn').onclick = function() { closeEventView(); selectedEventId = null; };
-        document.getElementById('eventViewModal').onclick = function(e) { if (e.target === this) { closeEventView(); selectedEventId = null; } };
+        document.getElementById('viewCloseBtn').onclick = function() { closeEventView(); selectedEventId = null; selectedEventDate = null; };
+        document.getElementById('eventViewModal').onclick = function(e) { if (e.target === this) { closeEventView(); selectedEventId = null; selectedEventDate = null; } };
         document.getElementById('viewEditBtn').onclick = openEventEdit;
         document.getElementById('viewDeleteBtn').onclick = function() {
           if (!selectedEventId) return;
@@ -2109,6 +2491,33 @@
           save('schedule_events', events);
           closeEventView();
           selectedEventId = null;
+          selectedEventDate = null;
+          renderSchedule();
+        };
+        function applyAttendStatus(status) {
+          if (!selectedEventId) return;
+          var ev = events.find(function(e){ return e.id === selectedEventId; });
+          if (!ev) return;
+          var reason = status === 'missed' ? (document.getElementById('viewMissReason').value || '') : '';
+          setAttendance(ev, selectedEventDate, status, reason);
+          save('schedule_events', events);
+          updateAttendUI(status, reason);
+          renderSchedule();
+        }
+        document.getElementById('attendNone').onclick = function() { applyAttendStatus('none'); };
+        document.getElementById('attendYes').onclick = function() { applyAttendStatus('attended'); };
+        document.getElementById('attendNo').onclick = function() {
+          applyAttendStatus('missed');
+          document.getElementById('viewMissReason').focus();
+        };
+        document.getElementById('attendSaveReason').onclick = function() {
+          if (!selectedEventId) return;
+          var ev = events.find(function(e){ return e.id === selectedEventId; });
+          if (!ev) return;
+          var reason = document.getElementById('viewMissReason').value.trim();
+          setAttendance(ev, selectedEventDate, 'missed', reason);
+          save('schedule_events', events);
+          updateAttendUI('missed', reason);
           renderSchedule();
         };
 
@@ -2237,6 +2646,67 @@
         var d=new Date();d.setDate(d.getDate()+30);gd.value=fd(d);
 
         // Finance
+        
+        fillAccountSelects();
+        var ftb = document.getElementById('finTransferBtn');
+        if (ftb) ftb.onclick = function() {
+          fillAccountSelects();
+          document.getElementById('trDate').value = fd(new Date());
+          document.getElementById('trAmount').value = '';
+          document.getElementById('trNote').value = '';
+          if (accounts[0]) document.getElementById('trFrom').value = accounts[0].id;
+          if (accounts[1]) document.getElementById('trTo').value = accounts[1].id;
+          document.getElementById('transferModal').classList.add('open');
+        };
+        var trc = document.getElementById('trClose');
+        if (trc) trc.onclick = function() { document.getElementById('transferModal').classList.remove('open'); };
+        var trm = document.getElementById('transferModal');
+        if (trm) trm.onclick = function(e) { if (e.target === this) this.classList.remove('open'); };
+        var trs = document.getElementById('trSave');
+        if (trs) trs.onclick = function() {
+          var from = document.getElementById('trFrom').value;
+          var to = document.getElementById('trTo').value;
+          var amount = parseFloat(document.getElementById('trAmount').value);
+          var note = document.getElementById('trNote').value.trim();
+          var date = document.getElementById('trDate').value;
+          if (!from || !to || from === to) { alert('Выбери разные счета'); return; }
+          if (!amount || amount <= 0 || !date) { alert('Укажи сумму и дату'); return; }
+          var pairId = Date.now().toString();
+          transactions.push({
+            id: pairId + '_out', type: 'expense', amount: amount, category: 'other_exp',
+            account: from, note: note || ('→ ' + accountName(to)), date: date, created: Date.now(),
+            transfer: 'out', transferTo: to, transferPair: pairId
+          });
+          transactions.push({
+            id: pairId + '_in', type: 'income', amount: amount, category: 'other_inc',
+            account: to, note: note || ('← ' + accountName(from)), date: date, created: Date.now(),
+            transfer: 'in', transferFrom: from, transferPair: pairId
+          });
+          save('schedule_finance', transactions);
+          document.getElementById('transferModal').classList.remove('open');
+          renderFinance();
+        };
+        var mab = document.getElementById('finManageAccBtn');
+        if (mab) mab.onclick = function() {
+          renderAccountsManage();
+          document.getElementById('newAccName').value = '';
+          document.getElementById('accountsModal').classList.add('open');
+        };
+        var ac = document.getElementById('accountsClose');
+        if (ac) ac.onclick = function() { document.getElementById('accountsModal').classList.remove('open'); };
+        var am = document.getElementById('accountsModal');
+        if (am) am.onclick = function(e) { if (e.target === this) this.classList.remove('open'); };
+        var nas = document.getElementById('newAccSave');
+        if (nas) nas.onclick = function() {
+          var name = document.getElementById('newAccName').value.trim();
+          if (!name) { alert('Введи название счёта'); return; }
+          var color = document.getElementById('newAccColor').value || '#0a84ff';
+          accounts.push({ id: 'acc_' + Date.now().toString(36), name: name, color: color, icon: '💰' });
+          saveAccounts();
+          renderAccountsManage();
+          document.getElementById('newAccName').value = '';
+        };
+
         fillCatSelect(document.getElementById('txCategory'), 'expense');
         document.getElementById('txDate').value = fd(new Date());
         document.querySelectorAll('#financeForm .type-btn').forEach(function(btn) {
@@ -2257,9 +2727,10 @@
           var date = document.getElementById('txDate').value;
           var type = document.getElementById('txType').value || 'expense';
           if (!amount || amount <= 0 || !date) { alert(t('alert_fill_tx')); return; }
+          var account = (document.getElementById('txAccount') && document.getElementById('txAccount').value) || 'personal';
           transactions.push({
             id: Date.now().toString(),
-            type: type, amount: amount, category: category,
+            type: type, amount: amount, category: category, account: account,
             note: note, date: date, created: Date.now()
           });
           save('schedule_finance', transactions);
@@ -2276,11 +2747,25 @@
             renderFinance();
           });
         });
+        document.querySelectorAll('[data-account]').forEach(function(chip) {
+          chip.addEventListener('click', function() {
+            finAccount = chip.getAttribute('data-account');
+            document.querySelectorAll('[data-account]').forEach(function(c) {
+              c.classList.toggle('active', c === chip);
+            });
+            renderFinance();
+          });
+        });
         document.getElementById('financeModalClose').onclick = closeFinanceModal;
         document.getElementById('financeModal').onclick = function(e) { if (e.target === this) closeFinanceModal(); };
         document.getElementById('financeModalDelete').onclick = function() {
           if (!selectedTxId) return;
-          transactions = transactions.filter(function(t){ return t.id !== selectedTxId; });
+          var tx = transactions.find(function(t){ return t.id === selectedTxId; });
+          if (tx && tx.transferPair) {
+            transactions = transactions.filter(function(t){ return t.transferPair !== tx.transferPair; });
+          } else {
+            transactions = transactions.filter(function(t){ return t.id !== selectedTxId; });
+          }
           save('schedule_finance', transactions);
           closeFinanceModal();
           renderFinance();
@@ -2294,6 +2779,8 @@
           if (!amount || amount <= 0 || !date) { alert(t('alert_fill_tx')); return; }
           t.type = document.getElementById('editTxType').value;
           t.amount = amount;
+          var ea = document.getElementById('editTxAccount');
+          if (ea) t.account = ea.value || 'personal';
           t.category = document.getElementById('editTxCategory').value;
           t.note = document.getElementById('editTxNote').value.trim();
           t.date = date;
@@ -2341,7 +2828,8 @@
             events: events,
             goals: goals,
             ideas: ideas,
-            transactions: transactions
+            transactions: transactions,
+            accounts: accounts
           };
           var blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
           var url = URL.createObjectURL(blob);
@@ -2374,6 +2862,7 @@
               if (Array.isArray(data.goals)) { goals = data.goals; save('schedule_goals', goals); }
               if (Array.isArray(data.ideas)) { ideas = data.ideas; save('schedule_ideas', ideas); }
               if (Array.isArray(data.transactions)) { transactions = data.transactions; save('schedule_finance', transactions); }
+              if (Array.isArray(data.accounts) && data.accounts.length) { accounts = data.accounts; save('schedule_accounts', accounts); fillAccountSelects(); }
               closeDrawer();
               renderSchedule();
               try { renderGoals(); } catch(err) {}
@@ -2389,6 +2878,7 @@
 
         renderSchedule();
         applyLang();
+        initPWA();
       }
 
       if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);
