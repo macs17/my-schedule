@@ -8,7 +8,8 @@
   <meta name="apple-mobile-web-app-title" content="Расписание">
   <meta name="mobile-web-app-capable" content="yes">
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="apple-touch-icon" href="icon-192.png">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>My Schedule</title>
@@ -905,9 +906,104 @@
       font-size: 0.75rem; color: var(--text-muted); line-height: 1.35;
       margin-top: 8px; padding: 0 4px;
     }
+  
+    .cloud-block {
+      margin: 10px 0; padding: 12px;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid var(--border);
+    }
+    .cloud-block .cb-title {
+      font-size: 0.85rem; font-weight: 700; margin-bottom: 8px; color: var(--text);
+    }
+    .cloud-block .form-group { margin-bottom: 8px; }
+    .cloud-block input {
+      width: 100%; padding: 10px 12px; border-radius: 10px;
+      border: 1px solid var(--border); background: rgba(120,120,128,0.12);
+      color: var(--text); font-size: 16px; font-family: inherit;
+    }
+    .cloud-status {
+      font-size: 0.75rem; margin-top: 6px; line-height: 1.35;
+      color: var(--text-muted);
+    }
+    .cloud-status.ok { color: #30d158; }
+    .cloud-status.err { color: #ff453a; }
+    .cloud-actions { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; }
+  
+    .splash {
+      position: fixed; inset: 0; z-index: 99999;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      background: radial-gradient(120% 80% at 50% 20%, #1a3a6a 0%, #0a0a0f 55%, #000 100%);
+      transition: opacity 0.55s ease, visibility 0.55s ease;
+    }
+    .splash.hide {
+      opacity: 0; visibility: hidden; pointer-events: none;
+    }
+    .splash-glow {
+      position: absolute; width: 280px; height: 280px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(10,132,255,0.45) 0%, transparent 70%);
+      filter: blur(8px); animation: splashPulse 2.4s ease-in-out infinite;
+    }
+    @keyframes splashPulse {
+      0%, 100% { transform: scale(1); opacity: 0.7; }
+      50% { transform: scale(1.12); opacity: 1; }
+    }
+    .splash-card {
+      position: relative;
+      width: 96px; height: 96px; border-radius: 26px;
+      background: linear-gradient(145deg, #0a84ff, #5e5ce6);
+      box-shadow: 0 20px 50px rgba(10,132,255,0.45), inset 0 1px 0 rgba(255,255,255,0.35);
+      display: flex; align-items: center; justify-content: center;
+      animation: splashIn 0.7s cubic-bezier(0.22,1,0.36,1) both;
+    }
+    .splash-card svg { width: 54px; height: 54px; }
+    @keyframes splashIn {
+      from { opacity: 0; transform: scale(0.7) translateY(16px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    .splash-title {
+      margin-top: 22px; font-size: 1.55rem; font-weight: 700;
+      letter-spacing: -0.03em; color: #fff;
+      animation: splashIn 0.7s 0.1s cubic-bezier(0.22,1,0.36,1) both;
+    }
+    .splash-sub {
+      margin-top: 8px; font-size: 0.9rem; color: rgba(255,255,255,0.55);
+      animation: splashIn 0.7s 0.18s cubic-bezier(0.22,1,0.36,1) both;
+    }
+    .splash-loader {
+      margin-top: 28px; width: 36px; height: 36px;
+      border: 3px solid rgba(255,255,255,0.12);
+      border-top-color: #0a84ff; border-radius: 50%;
+      animation: splashSpin 0.8s linear infinite;
+    }
+    @keyframes splashSpin { to { transform: rotate(360deg); } }
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.8/dist/umd/supabase.min.js"></script>
 </head>
 <body>
+
+  <div class="splash" id="appSplash">
+    <div class="splash-glow"></div>
+    <div class="splash-card" aria-hidden="true">
+      <svg viewBox="0 0 54 54" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="8" y="12" width="38" height="34" rx="6" fill="white"/>
+        <rect x="8" y="12" width="38" height="10" rx="6" fill="white"/>
+        <rect x="8" y="18" width="38" height="4" fill="#0A84FF"/>
+        <circle cx="18" cy="12" r="2.5" fill="#0A84FF"/>
+        <circle cx="36" cy="12" r="2.5" fill="#0A84FF"/>
+        <rect x="14" y="28" width="8" height="6" rx="1.5" fill="#0A84FF"/>
+        <rect x="25" y="28" width="8" height="6" rx="1.5" fill="#30D158"/>
+        <rect x="36" y="28" width="6" height="6" rx="1.5" fill="#0A84FF" opacity="0.5"/>
+        <rect x="14" y="37" width="8" height="6" rx="1.5" fill="#0A84FF" opacity="0.45"/>
+        <rect x="25" y="37" width="8" height="6" rx="1.5" fill="#0A84FF" opacity="0.35"/>
+      </svg>
+    </div>
+    <div class="splash-title">Моё расписание</div>
+    <div class="splash-sub">Расписание · Цели · Финансы</div>
+    <div class="splash-loader"></div>
+  </div>
+
   <div class="app">
     <div class="top-row">
       <button type="button" class="menu-btn" id="menuBtn" aria-label="Menu">☰</button>
@@ -939,7 +1035,34 @@
       <div class="pwa-hint" id="pwaHint" style="margin:10px 4px 6px;font-size:0.75rem;color:var(--text-muted);line-height:1.35">
         Чтобы установить приложение: в меню браузера выбери «На экран „Домой“» / «Установить приложение».
       </div>
-      <div class="drawer-data">
+            <div class="cloud-block" id="cloudBlock">
+        <div class="cb-title">☁️ Облако</div>
+        <div id="cloudLoggedOut">
+          <div class="form-group">
+            <input type="email" id="cloudEmail" placeholder="Email" autocomplete="username">
+          </div>
+          <div class="form-group">
+            <input type="password" id="cloudPassword" placeholder="Пароль" autocomplete="current-password">
+          </div>
+          <div class="cloud-actions">
+            <button type="button" class="drawer-data-btn" id="cloudLoginBtn"><span>🔑</span> Войти</button>
+            <button type="button" class="drawer-data-btn" id="cloudRegisterBtn"><span>✨</span> Регистрация</button>
+          </div>
+        </div>
+        <div id="cloudLoggedIn" style="display:none">
+          <div class="cloud-status ok" id="cloudUserLabel">—</div>
+          <div class="cloud-actions">
+            <button type="button" class="drawer-data-btn" id="cloudSyncBtn"><span>🔄</span> Синхронизировать</button>
+            <button type="button" class="drawer-data-btn" id="cloudLogoutBtn"><span>🚪</span> Выйти</button>
+          </div>
+        </div>
+        <div class="cloud-status" id="cloudStatus">Синхронизация между устройствами</div>
+        <!-- hidden legacy fields for initCloud compatibility -->
+        <input type="hidden" id="cloudUrl" value="">
+        <input type="hidden" id="cloudKey" value="">
+        <button type="button" id="cloudSaveCfgBtn" style="display:none"></button>
+      </div>
+<div class="drawer-data">
         <button type="button" class="drawer-data-btn" id="exportBtn">
           <span>💾</span> <span data-i18n="export_data">Сохранить в файл</span>
         </button>
@@ -1393,7 +1516,7 @@
 
   <script>
     (function() {
-      const START_HOUR = 7, END_HOUR = 23, HOUR_HEIGHT = 42;
+      const START_HOUR = 0, END_HOUR = 24, HOUR_HEIGHT = 40;
       const CAT_COLORS = { study:'#6366f1', work:'#8b5cf6', sport:'#22c55e', personal:'#f59e0b', other:'#71717a' };
       const CAT_NAMES = { study:'Учёба', work:'Работа', sport:'Спорт', personal:'Личное', other:'Другое' };
 
@@ -1431,7 +1554,7 @@
           exp_food: '🍔 Еда', exp_transport: '🚌 Транспорт', exp_home: '🏠 Жильё', exp_health: '💊 Здоровье',
           exp_fun: '🎮 Развлечения', exp_clothes: '👕 Одежда', exp_study: '📚 Учёба', exp_sport: '🏋️ Спорт', exp_other: '📌 Другое',
           inc_salary: '💼 Зарплата', inc_freelance: '💻 Фриланс', inc_gift: '🎁 Подарок', inc_other: '📌 Другое',
-          alert_end_time: 'Конец должен быть позже начала',
+          alert_end_time: 'Начало и конец не могут совпадать (для ночной смены укажи, например, 20:00–08:00)',
           alert_fill_event: 'Заполни название, дату и время',
           alert_fill_goal: 'Заполни название и срок',
           alert_fill_idea: 'Заполни заголовок и текст',
@@ -1481,7 +1604,7 @@
           exp_food: '🍔 Food', exp_transport: '🚌 Transport', exp_home: '🏠 Housing', exp_health: '💊 Health',
           exp_fun: '🎮 Fun', exp_clothes: '👕 Clothes', exp_study: '📚 Study', exp_sport: '🏋️ Sport', exp_other: '📌 Other',
           inc_salary: '💼 Salary', inc_freelance: '💻 Freelance', inc_gift: '🎁 Gift', inc_other: '📌 Other',
-          alert_end_time: 'End time must be after start',
+          alert_end_time: 'Start and end cannot be the same (for overnight use e.g. 20:00–08:00)',
           alert_fill_event: 'Fill in title, date and time',
           alert_fill_goal: 'Fill in title and deadline',
           alert_fill_idea: 'Fill in title and text',
@@ -1828,14 +1951,58 @@
       }
 
       function load(k, d) { try { const x = localStorage.getItem(k); return x ? JSON.parse(x) : d; } catch(e) { return d; } }
-      function save(k, d) { try { localStorage.setItem(k, JSON.stringify(d)); } catch(e) {} }
+      function save(k, d) { try { localStorage.setItem(k, JSON.stringify(d)); } catch(e) {} try { scheduleCloudPush(); } catch(e) {} }
       function getMonday(d) {
         const x = new Date(d); const day = x.getDay();
         x.setDate(x.getDate() + (day === 0 ? -6 : 1 - day)); x.setHours(0,0,0,0); return x;
       }
       function fd(d) { return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
       function ft(h, m) { return String(h).padStart(2,'0')+':'+String(m||0).padStart(2,'0'); }
-      function pt(s) { const p = s.split(':').map(Number); return p[0]+p[1]/60; }
+      function pt(s) {
+        if (!s) return 0;
+        if (s === '24:00') return 24;
+        const p = String(s).split(':').map(Number);
+        return (p[0]||0) + (p[1]||0)/60;
+      }
+      function isOvernight(start, end) {
+        return pt(end) <= pt(start);
+      }
+      function eventDuration(start, end) {
+        var a = pt(start), b = pt(end);
+        if (b > a) return b - a;
+        return (24 - a) + b;
+      }
+      function addDaysStr(dateStr, days) {
+        var d = new Date(dateStr + 'T12:00:00');
+        d.setDate(d.getDate() + days);
+        return fd(d);
+      }
+      /** Split overnight events into day segments for the grid */
+      function expandEventForGrid(ev) {
+        if (!isOvernight(ev.start, ev.end)) {
+          return [Object.assign({}, ev, { baseId: ev.baseId || ev.id, displayStart: ev.start, displayEnd: ev.end })];
+        }
+        var next = addDaysStr(ev.date, 1);
+        return [
+          Object.assign({}, ev, {
+            baseId: ev.baseId || ev.id,
+            date: ev.date,
+            displayStart: ev.start,
+            displayEnd: '24:00',
+            overnight: true,
+            segment: 'start'
+          }),
+          Object.assign({}, ev, {
+            baseId: ev.baseId || ev.id,
+            id: (ev.baseId || ev.id) + '_n_' + next,
+            date: next,
+            displayStart: '00:00',
+            displayEnd: ev.end,
+            overnight: true,
+            segment: 'end'
+          })
+        ];
+      }
       function weekDays(m) {
         const a=[]; for(let i=0;i<7;i++){const d=new Date(m);d.setDate(m.getDate()+i);a.push(d);} return a;
       }
@@ -1853,29 +2020,36 @@
         const result = [];
         const from = fd(fromDate);
         const to = fd(toDate);
+        // include day before range so overnight tails appear on from-date morning
+        var fromMinus = addDaysStr(from, -1);
+
+        function pushInstance(ev, ds) {
+          var inst = {
+            id: ev.repeat ? (ev.id + '_' + ds) : ev.id,
+            baseId: ev.id,
+            title: ev.title, date: ds, start: ev.start, end: ev.end,
+            address: ev.address, notes: ev.notes, color: ev.color,
+            category: ev.category, repeat: !!ev.repeat,
+            attendanceLog: ev.attendanceLog, attendance: ev.attendance, missReason: ev.missReason
+          };
+          expandEventForGrid(inst).forEach(function(seg) {
+            if (seg.date >= from && seg.date <= to) result.push(seg);
+          });
+        }
+
         events.forEach(function(ev) {
           if (!ev.repeat) {
-            if (ev.date >= from && ev.date <= to) result.push(ev);
+            if (ev.date >= fromMinus && ev.date <= to) pushInstance(ev, ev.date);
             return;
           }
-          // weekly repeat: generate instances within range
           var start = new Date(ev.date + 'T00:00:00');
           var end = new Date(toDate); end.setHours(23,59,59);
+          var rangeStart = new Date(fromDate); rangeStart.setDate(rangeStart.getDate() - 1);
           var cur = new Date(start);
-          // go back to cover range start
-          while (cur > fromDate) cur.setDate(cur.getDate() - 7);
+          while (cur > rangeStart) cur.setDate(cur.getDate() - 7);
           while (cur <= end) {
             var ds = fd(cur);
-            if (ds >= from && ds <= to && ds >= ev.date) {
-              result.push({
-                id: ev.id + '_' + ds,
-                baseId: ev.id,
-                title: ev.title, date: ds, start: ev.start, end: ev.end,
-                address: ev.address, notes: ev.notes, color: ev.color,
-                category: ev.category, repeat: true,
-                attendanceLog: ev.attendanceLog, attendance: ev.attendance, missReason: ev.missReason
-              });
-            }
+            if (ds >= fromMinus && ds <= to && ds >= ev.date) pushInstance(ev, ds);
             cur.setDate(cur.getDate() + 7);
           }
         });
@@ -1971,16 +2145,24 @@
           html += '<div class="day-column">';
           for (var h=START_HOUR; h<END_HOUR; h++) html += '<div class="hour-line" style="top:'+((h-START_HOUR)*HOUR_HEIGHT)+'px"></div>';
           dayEvs.forEach(function(ev) {
-            var top = (pt(ev.start)-START_HOUR)*HOUR_HEIGHT;
-            var ht = Math.max((pt(ev.end)-pt(ev.start))*HOUR_HEIGHT, 18);
+            var ds = ev.displayStart || ev.start;
+            var de = ev.displayEnd || ev.end;
+            var top = (pt(ds)-START_HOUR)*HOUR_HEIGHT;
+            var ht = Math.max((pt(de)-pt(ds))*HOUR_HEIGHT, 18);
+            if (top < 0) { ht += top; top = 0; }
+            var maxH = (END_HOUR-START_HOUR)*HOUR_HEIGHT;
+            if (top + ht > maxH) ht = Math.max(maxH - top, 14);
+            if (ht < 14) ht = 14;
             var rid = ev.baseId || ev.id;
-            var att = getAttendance(ev, ev.date);
+            var origDate = (ev.overnight && ev.segment === 'end') ? addDaysStr(ev.date, -1) : ev.date;
+            var att = getAttendance(ev, origDate);
             var attClass = att.status === 'attended' ? ' attended' : (att.status === 'missed' ? ' missed' : '');
             var badge = att.status === 'attended' ? '<span class="event-badge">✓</span>' : (att.status === 'missed' ? '<span class="event-badge">✕</span>' : '');
-            html += '<div class="event'+attClass+'" style="top:'+top+'px;height:'+ht+'px;background:'+(ev.color||'#6366f1')+'" data-id="'+rid+'" data-date="'+ev.date+'">' +
+            var timeLabel = (ev.overnight ? (ev.start + '–' + ev.end + ' 🌙') : (ev.start + '–' + ev.end)) + (ev.repeat ? ' 🔄' : '');
+            html += '<div class="event'+attClass+'" style="top:'+top+'px;height:'+ht+'px;background:'+(ev.color||'#6366f1')+'" data-id="'+rid+'" data-date="'+origDate+'">' +
               badge +
               '<div class="event-title">'+esc(ev.title)+'</div>' +
-              '<div class="event-time">'+ev.start+'–'+ev.end+(ev.repeat?' 🔄':'')+'</div></div>';
+              '<div class="event-time">'+timeLabel+'</div></div>';
           });
           if (ds === today) {
             var now = new Date(); var nh = now.getHours()+now.getMinutes()/60;
@@ -2001,11 +2183,11 @@
       function renderFreeTime() {
         var today = fd(new Date());
         var vis = getVisibleEvents(new Date(), new Date());
-        var dayEvents = vis.filter(function(e){return e.date===today;}).sort(function(a,b){return pt(a.start)-pt(b.start);});
+        var dayEvents = vis.filter(function(e){return e.date===today;}).sort(function(a,b){return pt(a.displayStart||a.start)-pt(b.displayStart||b.start);});
         if (activeFilter !== 'all') dayEvents = dayEvents.filter(function(e){return (e.category||'other')===activeFilter;});
         var free=[], cur=START_HOUR;
         dayEvents.forEach(function(ev){
-          var s=pt(ev.start),e=pt(ev.end);
+          var s=pt(ev.displayStart||ev.start), e=pt(ev.displayEnd||ev.end);
           if(s>cur)free.push({s:cur,e:s});
           cur=Math.max(cur,e);
         });
@@ -2015,7 +2197,7 @@
         var html=free.map(function(sl){
           return '<div class="free-slot">'+ft(Math.floor(sl.s),Math.round((sl.s%1)*60))+' – '+ft(Math.floor(sl.e),Math.round((sl.e%1)*60))+'</div>';
         }).join('');
-        var busy=dayEvents.reduce(function(s,e){return s+(pt(e.end)-pt(e.start))*60;},0);
+        var busy=dayEvents.reduce(function(s,e){return s+eventDuration(e.displayStart||e.start, e.displayEnd||e.end)*60;},0);
         html+='<div class="busy-info">'+t('busy_min')+': '+Math.round(busy)+' '+t('min')+'</div>';
         box.innerHTML=html;
       }
@@ -2027,7 +2209,7 @@
         vis.forEach(function(ev) {
           var cat = ev.category || 'other';
           if (!totals[cat] && totals[cat]!==0) cat='other';
-          totals[cat] = (totals[cat]||0) + (pt(ev.end)-pt(ev.start));
+          totals[cat] = (totals[cat]||0) + eventDuration(ev.start, ev.end);
         });
         var totalH = Object.keys(totals).reduce(function(s,k){return s+totals[k];},0);
         var row = document.getElementById('statsRow');
@@ -2103,7 +2285,7 @@
         selectedEventId = id;
         selectedEventDate = date || ev.date;
         document.getElementById('viewTitle').textContent = ev.title || '—';
-        document.getElementById('viewTime').textContent = fmtDateNice(selectedEventDate) + ' · ' + (ev.start||'') + ' – ' + (ev.end||'');
+        document.getElementById('viewTime').textContent = fmtDateNice(selectedEventDate) + ' · ' + (ev.start||'') + ' – ' + (ev.end||'') + (isOvernight(ev.start, ev.end) ? ' 🌙' : '');
         document.getElementById('viewColorBar').style.background = ev.color || '#6366f1';
         var ar = document.getElementById('viewAddressRow');
         if (ev.address) { ar.style.display = 'block'; document.getElementById('viewAddress').textContent = ev.address; }
@@ -2385,10 +2567,297 @@
       }
 
       
-      function initPWA() {
-        if ('serviceWorker' in navigator) {
-          navigator.serviceWorker.register('./sw.js').catch(function(){});
+      
+      // ---- Cloud sync (Supabase free tier) ----
+      var supabaseClient = null;
+      var cloudUser = null;
+      var cloudSyncTimer = null;
+      var cloudPushing = false;
+      var cloudHydrating = false;
+
+      var DEFAULT_CLOUD_CFG = {
+        url: 'https://xburzjjzrvwcjvjwbadc.supabase.co',
+        key: 'sb_publishable_YQt0bNwpC6OvrvNFjeuZ6w_8FaU1AEj'
+      };
+      function getCloudCfg() {
+        try {
+          var saved = JSON.parse(localStorage.getItem('schedule_cloud_cfg') || '{}');
+          return {
+            url: (saved.url || DEFAULT_CLOUD_CFG.url || '').trim(),
+            key: (saved.key || DEFAULT_CLOUD_CFG.key || '').trim()
+          };
+        } catch (e) {
+          return { url: DEFAULT_CLOUD_CFG.url, key: DEFAULT_CLOUD_CFG.key };
         }
+      }
+      function setCloudCfg(cfg) {
+        try { localStorage.setItem('schedule_cloud_cfg', JSON.stringify(cfg)); } catch (e) {}
+      }
+      function setCloudStatus(msg, type) {
+        var el = document.getElementById('cloudStatus');
+        if (!el) return;
+        el.textContent = msg || '';
+        el.className = 'cloud-status' + (type === 'ok' ? ' ok' : type === 'err' ? ' err' : '');
+      }
+      function updateCloudUI() {
+        var out = document.getElementById('cloudLoggedOut');
+        var inn = document.getElementById('cloudLoggedIn');
+        var label = document.getElementById('cloudUserLabel');
+        if (!out || !inn) return;
+        if (cloudUser && cloudUser.email) {
+          out.style.display = 'none';
+          inn.style.display = 'block';
+          if (label) label.textContent = '✓ ' + cloudUser.email;
+        } else {
+          out.style.display = 'block';
+          inn.style.display = 'none';
+        }
+      }
+      function initSupabase() {
+        supabaseClient = null;
+        var lib = (typeof supabase !== 'undefined') ? supabase : (typeof window !== 'undefined' ? window.supabase : null);
+        if (!lib || !lib.createClient) {
+          setCloudStatus('Библиотека облака не загрузилась. Проверь интернет.', 'err');
+          return false;
+        }
+        var cfg = getCloudCfg();
+        if (!cfg.url || !cfg.key) {
+          setCloudStatus('Облако не настроено', 'err');
+          return false;
+        }
+        try {
+          supabaseClient = lib.createClient(cfg.url, cfg.key, {
+            auth: {
+              persistSession: true,
+              autoRefreshToken: true,
+              detectSessionInUrl: true,
+              storage: window.localStorage
+            }
+          });
+          return true;
+        } catch (e) {
+          setCloudStatus('Ошибка подключения: ' + (e.message || e), 'err');
+          return false;
+        }
+      }
+      async function cloudGetSession() {
+        if (!supabaseClient) return null;
+        try {
+          var res = await supabaseClient.auth.getSession();
+          cloudUser = (res && res.data && res.data.session) ? res.data.session.user : null;
+          updateCloudUI();
+          return cloudUser;
+        } catch (e) {
+          cloudUser = null;
+          updateCloudUI();
+          return null;
+        }
+      }
+      function collectAllData() {
+        return {
+          events: events,
+          goals: goals,
+          ideas: ideas,
+          transactions: transactions,
+          accounts: accounts,
+          updatedAt: new Date().toISOString()
+        };
+      }
+      function applyCloudData(data) {
+        if (!data || typeof data !== 'object') return;
+        cloudHydrating = true;
+        try {
+          if (Array.isArray(data.events)) { events = data.events; try { localStorage.setItem('schedule_events', JSON.stringify(events)); } catch(e) {} }
+          if (Array.isArray(data.goals)) { goals = data.goals; try { localStorage.setItem('schedule_goals', JSON.stringify(goals)); } catch(e) {} }
+          if (Array.isArray(data.ideas)) { ideas = data.ideas; try { localStorage.setItem('schedule_ideas', JSON.stringify(ideas)); } catch(e) {} }
+          if (Array.isArray(data.transactions)) { transactions = data.transactions; try { localStorage.setItem('schedule_finance', JSON.stringify(transactions)); } catch(e) {} }
+          if (Array.isArray(data.accounts) && data.accounts.length) {
+            accounts = data.accounts;
+            try { localStorage.setItem('schedule_accounts', JSON.stringify(accounts)); } catch(e) {}
+            try { fillAccountSelects(); } catch (e) {}
+          }
+          try { renderSchedule(); } catch (e) {}
+          try { renderGoals(); } catch (e) {}
+          try { renderIdeas(); } catch (e) {}
+          try { renderFinance(); } catch (e) {}
+        } finally {
+          cloudHydrating = false;
+        }
+      }
+      async function cloudPull() {
+        if (!supabaseClient || !cloudUser) return false;
+        setCloudStatus('Загрузка из облака…', '');
+        try {
+          var res = await supabaseClient
+            .from('user_sync')
+            .select('payload, updated_at')
+            .eq('user_id', cloudUser.id)
+            .maybeSingle();
+          if (res.error) throw res.error;
+          if (res.data && res.data.payload) {
+            applyCloudData(res.data.payload);
+            setCloudStatus('Данные загружены из облака', 'ok');
+            return true;
+          }
+          await cloudPush(true);
+          setCloudStatus('Облако пустое — отправили локальные данные', 'ok');
+          return true;
+        } catch (e) {
+          var msg = (e && e.message) ? e.message : String(e);
+          if (/Failed to fetch|NetworkError|fetch/i.test(msg)) {
+            setCloudStatus('Нет сети. Работаем локально.', 'err');
+          } else {
+            setCloudStatus('Ошибка загрузки: ' + msg, 'err');
+          }
+          return false;
+        }
+      }
+      async function cloudPush(silent) {
+        if (!supabaseClient || !cloudUser || cloudPushing || cloudHydrating) return false;
+        cloudPushing = true;
+        if (!silent) setCloudStatus('Сохранение в облако…', '');
+        try {
+          var payload = collectAllData();
+          var res = await supabaseClient.from('user_sync').upsert({
+            user_id: cloudUser.id,
+            payload: payload,
+            updated_at: new Date().toISOString()
+          }, { onConflict: 'user_id' });
+          if (res.error) throw res.error;
+          if (!silent) setCloudStatus('Сохранено в облаке', 'ok');
+          cloudPushing = false;
+          return true;
+        } catch (e) {
+          var msg = (e && e.message) ? e.message : String(e);
+          if (!silent) {
+            if (/Failed to fetch|NetworkError|fetch/i.test(msg)) {
+              setCloudStatus('Нет сети. Изменения сохранены только на устройстве.', 'err');
+            } else {
+              setCloudStatus('Ошибка сохранения: ' + msg, 'err');
+            }
+          }
+          cloudPushing = false;
+          return false;
+        }
+      }
+      function scheduleCloudPush() {
+        if (!cloudUser || !supabaseClient || cloudHydrating) return;
+        if (cloudSyncTimer) clearTimeout(cloudSyncTimer);
+        cloudSyncTimer = setTimeout(function() { cloudPush(true); }, 1500);
+      }
+      function cloudErrText(e) {
+        var msg = (e && e.message) ? e.message : String(e || '');
+        if (/Invalid login credentials/i.test(msg)) return 'Неверный email или пароль';
+        if (/User already registered/i.test(msg)) return 'Такой email уже зарегистрирован — нажми Войти';
+        if (/Email not confirmed/i.test(msg)) return 'Подтверди email или отключи Confirm email в Supabase';
+        if (/Password should be at least/i.test(msg)) return 'Пароль слишком короткий (мин. 6 символов)';
+        if (/Failed to fetch|NetworkError/i.test(msg)) return 'Нет интернета';
+        if (/Invalid API key|JWT|apikey/i.test(msg)) return 'Ошибка ключа API. Нужен publishable/anon key';
+        return msg || 'Неизвестная ошибка';
+      }
+      async function cloudRegister() {
+        if (!initSupabase()) return;
+        var emailEl = document.getElementById('cloudEmail');
+        var passEl = document.getElementById('cloudPassword');
+        var email = (emailEl && emailEl.value || '').trim();
+        var password = (passEl && passEl.value) || '';
+        if (!email || password.length < 6) {
+          setCloudStatus('Укажи email и пароль (мин. 6 символов)', 'err');
+          return;
+        }
+        setCloudStatus('Регистрация…', '');
+        try {
+          var res = await supabaseClient.auth.signUp({ email: email, password: password });
+          if (res.error) throw res.error;
+          cloudUser = res.data.user;
+          if (res.data.session) {
+            updateCloudUI();
+            await cloudPush(true);
+            setCloudStatus('Аккаунт создан, данные в облаке', 'ok');
+          } else {
+            cloudUser = null;
+            updateCloudUI();
+            setCloudStatus('Проверь почту или отключи Confirm email в Supabase → Auth', 'ok');
+          }
+        } catch (e) {
+          setCloudStatus(cloudErrText(e), 'err');
+        }
+      }
+      async function cloudLogin() {
+        if (!initSupabase()) return;
+        var emailEl = document.getElementById('cloudEmail');
+        var passEl = document.getElementById('cloudPassword');
+        var email = (emailEl && emailEl.value || '').trim();
+        var password = (passEl && passEl.value) || '';
+        if (!email || !password) {
+          setCloudStatus('Введи email и пароль', 'err');
+          return;
+        }
+        setCloudStatus('Вход…', '');
+        try {
+          var res = await supabaseClient.auth.signInWithPassword({ email: email, password: password });
+          if (res.error) throw res.error;
+          cloudUser = res.data.user;
+          updateCloudUI();
+          await cloudPull();
+        } catch (e) {
+          setCloudStatus(cloudErrText(e), 'err');
+        }
+      }
+      async function cloudLogout() {
+        if (supabaseClient) {
+          try { await supabaseClient.auth.signOut(); } catch (e) {}
+        }
+        cloudUser = null;
+        updateCloudUI();
+        setCloudStatus('Вышли из облака. Локальные данные на месте.', '');
+      }
+      function initCloud() {
+        var cfg = getCloudCfg();
+        function bind(id, fn) {
+          var el = document.getElementById(id);
+          if (el) el.onclick = fn;
+        }
+        bind('cloudSaveCfgBtn', function() {
+          var url = (document.getElementById('cloudUrl') && document.getElementById('cloudUrl').value || '').trim();
+          var key = (document.getElementById('cloudKey') && document.getElementById('cloudKey').value || '').trim();
+          if (!url || !key) { setCloudStatus('Нет URL или ключа', 'err'); return; }
+          setCloudCfg({ url: url, key: key });
+          initSupabase();
+          setCloudStatus('Ключи сохранены', 'ok');
+          cloudGetSession();
+        });
+        bind('cloudLoginBtn', function() { cloudLogin(); });
+        bind('cloudRegisterBtn', function() { cloudRegister(); });
+        bind('cloudLogoutBtn', function() { cloudLogout(); });
+        bind('cloudSyncBtn', async function() {
+          if (!cloudUser) return;
+          await cloudPush(false);
+          await cloudPull();
+        });
+
+        if (cfg.url && cfg.key) {
+          if (initSupabase()) {
+            cloudGetSession().then(function(u) {
+              if (u) cloudPull();
+              else setCloudStatus('Войди или зарегистрируйся для синхронизации', '');
+            });
+          }
+        } else {
+          setCloudStatus('Облако не настроено', 'err');
+        }
+
+        window.addEventListener('online', function() {
+          if (cloudUser) scheduleCloudPush();
+        });
+      }
+
+      function initPWA() {
+        try {
+          if (typeof navigator !== 'undefined' && 'serviceWorker' in navigator) {
+            navigator.serviceWorker.register('./sw.js').catch(function(){});
+          }
+        } catch (e) {}
         // optional install prompt
         window.addEventListener('beforeinstallprompt', function(e) {
           e.preventDefault();
@@ -2409,6 +2878,14 @@
         });
       }
 
+
+      
+      function hideSplash() {
+        var s = document.getElementById('appSplash');
+        if (!s) return;
+        s.classList.add('hide');
+        setTimeout(function(){ try { s.remove(); } catch(e) {} }, 600);
+      }
 
       function init() {
         document.querySelectorAll('.drawer-item').forEach(function(t){t.addEventListener('click',function(){switchTab(t.dataset.tab);});});
@@ -2465,7 +2942,7 @@
           var cat=document.getElementById('eventCategory').value;
           var repeat=document.getElementById('eventRepeat').checked;
           if(!title||!date||!start||!end)return;
-          if(pt(end)<=pt(start)){alert(t('alert_end_time'));return;}
+          if(pt(end)===pt(start)){alert(t('alert_end_time'));return;}
           events.push({id:Date.now().toString(),title:title,date:date,start:start,end:end,address:address,notes:notes,color:color,category:cat,repeat:repeat});
           save('schedule_events',events);
           renderSchedule();
@@ -2538,7 +3015,7 @@
           var start=document.getElementById('editEventStart').value;
           var end=document.getElementById('editEventEnd').value;
           if(!title||!date||!start||!end){alert(t('alert_fill_event'));return;}
-          if(pt(end)<=pt(start)){alert(t('alert_end_time'));return;}
+          if(pt(end)===pt(start)){alert(t('alert_end_time'));return;}
           ev.title=title;ev.date=date;ev.start=start;ev.end=end;
           ev.address=document.getElementById('editEventAddress').value.trim();
           ev.notes=document.getElementById('editEventNotes').value.trim();
@@ -2878,11 +3355,14 @@
 
         renderSchedule();
         applyLang();
-        initPWA();
+        try { initPWA(); } catch (e) {}
+        try { initCloud(); } catch (e) {}
+        setTimeout(hideSplash, 900);
       }
 
       if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);
       else init();
+      setTimeout(hideSplash, 2500);
     })();
   </script>
 </body>
